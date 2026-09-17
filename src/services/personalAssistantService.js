@@ -258,8 +258,19 @@ export async function processAssistantMessage(userId, text) {
     }
 
     // Gemini দিয়ে একটি নিখুঁত ইংরেজি ভিজ্যুয়াল প্রম্পট তৈরি করা
-    const promptRefiner = `You are an expert AI image prompt engineer. Convert this image request into an ultra-detailed, cinematic English image prompt for 1080x1080 3D Octane render: "${cleanQuery}". Output ONLY the prompt string, no explanations, no quotes.`;
-    const refinedPrompt = await geminiChat(promptRefiner, 300);
+    const promptRefiner = `You are an expert AI image prompt engineer for Black Forest Labs FLUX.1.
+A user made this image request in Bengali, Banglish, or English: "${trimmed}" (subject keywords: "${cleanQuery}").
+Instructions:
+1. Understand what the user wants to see. If it is in Banglish or Bengali (e.g., "mosjid" = Islamic Mosque, "pahar" = mountains, "gari" = sleek car, "nodi" = scenic river, "shundorbon" = mangrove forest), translate the real meaning accurately into English.
+2. Select the most stunning, realistic visual style:
+   - Architecture / Mosques: A magnificent, grand architectural photograph of a breathtaking mosque with intricate domes, tall soaring minarets, marble reflecting pool, warm golden hour sunset glow, 8k ultra-sharp detail, National Geographic style.
+   - Nature / Landscapes: Breathtaking landscape photography, dramatic natural lighting, vibrant colors.
+   - Portraits / People: Authentic studio portrait photography, Sony A7 IV 85mm f1.4 lens, natural skin texture, sharp detailed eyes.
+   - Tech / Coding / Future: Modern bright sunlit workspace, crisp screens, vivid colors.
+   - Only use 3D render if the user specifically asked for "3D" or "cartoon". Never force 3D render on mosques or nature.
+3. Strictly NO text or typography (never render 3D words of the prompt), no watermarks, no blur, no dark moody fog.
+4. Output ONLY the refined English prompt string, no explanations, no quotes.`;
+    const refinedPrompt = await geminiChat(promptRefiner, 400);
 
     const finalVisualPrompt = refinedPrompt && !refinedPrompt.includes('দুঃখিত') 
       ? refinedPrompt.replace(/^["']|["']$/g, '').trim() 
