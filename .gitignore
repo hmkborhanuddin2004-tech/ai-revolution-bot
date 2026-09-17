@@ -1,0 +1,25 @@
+﻿# Dependencies
+node_modules/
+
+# Environment secrets (Strictly private!)
+.env
+.env.local
+.env.production
+
+# Local persistent data and sessions
+data/
+data/whatsapp-session/
+data/whatsapp_replied.json
+data/agent_memory.json
+data/processed_events.json
+data/latestDraft.json
+data/backups/
+data/user_uploads/
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

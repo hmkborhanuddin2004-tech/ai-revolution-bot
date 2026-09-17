@@ -1,0 +1,25 @@
+{
+  "name": "ai-insight-bot",
+  "version": "1.0.0",
+  "description": "Facebook Page Automation & AI Content Engine for Ai Revolution",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test-draft": "node src/scripts/testDraft.js",
+    "test-facebook": "node src/scripts/testFacebook.js",
+    "test-replies": "node src/scripts/verifyAssistantReplies.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "node-cron": "^3.0.3",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.34.7"
+  },
+  "allowScripts": {
+    "puppeteer@24.38.0": true
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
