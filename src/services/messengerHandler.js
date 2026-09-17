@@ -41,6 +41,9 @@ export class MessengerHandler {
     if (messageId && this.tracker.has(messageId)) {
       return;
     }
+    if (messageId) {
+      this.tracker.add(messageId);
+    }
 
     // Handle text or attachments (stickers, thumbs-up, photos)
     const hasAttachments = Boolean(event.message.attachments && event.message.attachments.length > 0);

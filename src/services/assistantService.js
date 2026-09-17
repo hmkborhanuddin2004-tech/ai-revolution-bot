@@ -7,6 +7,7 @@ import { config } from '../config.js';
 import { generatePublicAssistantReply } from './geminiService.js';
 import { telegramAlertService } from './telegramAlertService.js';
 import { agentEngine } from './agentEngine.js';
+import { duplicateTracker } from './duplicateTracker.js';
 
 import { BORHAN_FB_PROFILE } from '../config.js';
 export { BORHAN_FB_PROFILE };
@@ -171,13 +172,24 @@ export class AssistantService {
     const isEscalated = this.isEscalationNeeded(messageText);
     const hasSpecificInquiry = this.isSpecificInquiry(messageText);
 
-    // Reply 1: Dignified greeting, busy status & Borhan Sir's personal link
-    const reply1 = `আসসালামু আলাইকুম ওয়া রাহমাতুল্লাহ। আমি বোরহান স্যারের এআই অ্যাসিস্ট্যান্ট। আপনাকে মেসেজ করার জন্য অসংখ্য ধন্যবাদ।\n\nবোরহান স্যার সফটওয়্যার ডেভেলপমেন্ট, ওয়েবসাইট ও অটোমেশনের প্রজেক্ট কাজে ব্যস্ত থাকায় তাৎক্ষণিক উত্তর দিতে পারছেন না। উনার সাথে পার্সোনালি কথা বলতে চাইলে উনার ফেসবুক লিঙ্কে যোগাযোগ করুন: ${BORHAN_FB_PROFILE}\n\nআপনি কী বিষয়ে সহযোগিতা চান তা এখানে জানাতে পারেন, আমি আপনাকে আন্তরিকভাবে সহযোগিতা করার চেষ্টা করছি।`;
+    // ১. চেক করা: এই ইউজারকে কি গত ২৪ ঘণ্টার মধ্যে ফরমাল পরিচয় ও লিঙ্ক দেওয়া হয়েছে?
+    const isAlreadyGreeted = senderPsid ? duplicateTracker.isUserGreeted(senderPsid) : false;
+
+    // ২. Reply 1 (বোরহান স্যারের লিঙ্ক ও প্রাথমিক বার্তা) কেবল তখনই দেওয়া হবে যদি ইউজার একদম নতুন হন
+    let reply1 = null;
+    if (!isAlreadyGreeted) {
+      reply1 = `আসসালামু আলাইকুম ওয়া রাহমাতুল্লাহ। আমি বোরহান স্যারের এআই অ্যাসিস্ট্যান্ট। আপনাকে মেসেজ করার জন্য অসংখ্য ধন্যবাদ।\n\nবোরহান স্যার সফটওয়্যার ডেভেলপমেন্ট, ওয়েবসাইট ও অটোমেশনের প্রজেক্ট কাজে ব্যস্ত থাকায় তাৎক্ষণিক উত্তর দিতে পারছেন না। উনার সাথে পার্সোনালি কথা বলতে চাইলে উনার ফেসবুক লিঙ্কে যোগাযোগ করুন: ${BORHAN_FB_PROFILE}\n\nআপনি কী বিষয়ে সহযোগিতা চান তা এখানে জানাতে পারেন, আমি আপনাকে আন্তরিকভাবে সহযোগিতা করার চেষ্টা করছি।`;
+      if (senderPsid) {
+        duplicateTracker.markUserGreeted(senderPsid);
+      }
+    }
 
     let reply2 = null;
     let toolsUsed = [];
 
-    if (hasSpecificInquiry || isEscalated) {
+    // ৩. Reply 2: যদি ইউজার কোনো প্রশ্ন/ইনকোয়ারি করেন অথবা ইউজার আগেই গ্রিট হয়ে থাকেন
+    // (মানে কনভার্সেশন চলছে), তবে এআই সরাসরি তাঁর প্রশ্নের টু-দ্য-পয়েন্ট উত্তর দেবে।
+    if (hasSpecificInquiry || isEscalated || isAlreadyGreeted) {
       const cleanName = cleanVisitorName(userName);
       const agentRes = await agentEngine.runAgent({
         userName: cleanName,
