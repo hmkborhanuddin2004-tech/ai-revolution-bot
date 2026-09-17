@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { config } from '../config.js';
 import { publishToFacebook, replyToComment } from './facebookService.js';
-import { chatWithGemini, WEEKLY_SCHEDULE, sanitizePostContent } from './geminiService.js';
+import { chatWithGemini, WEEKLY_SCHEDULE, sanitizePostContent, formatWeeklyScheduleMessage } from './geminiService.js';
 import { processAssistantMessage, processFile, processPhoto } from './personalAssistantService.js';
 import { getLocalCachedImagePath, generateImageUrl } from './imageService.js';
 
@@ -813,17 +813,45 @@ export function startApprovalListener(onAction) {
                 else if (hour >= 14 && hour < 17) tier = 2; // Card
                 else if (hour >= 17 && hour < 20) tier = 4; // Asr Prompt lab
                 else tier = 3; // Night Free vs Pro
-                await onAction('generate_tier', tier, fromId);
+                const isExplicitlyNew = text.includes('নতুন') || text.includes('notun') || text.includes('arekta') || text.includes('আরেকটা');
+                await onAction('generate_tier', { tier, forceRotate: isExplicitlyNew }, fromId);
               }
               continue;
             }
 
-            const rejectKeywords = ['পছন্দ হয়নি', 'নতুনভাবে বানাও', 'আরেকটা দাও'];
+            const rejectKeywords = ['পছন্দ হয়নি', 'নতুনভাবে বানাও', 'আরেকটা দাও', 'পছন্দ হয় নাই', 'arekta dao', 'pochondo hoyni'];
             if (rejectKeywords.some(k => text.includes(k)) && !text.includes('এই পরিবর্তন করো')) {
-              await sendTelegramMessage('🔄 ঠিক আছে বোরহান ভাই, আপনার নির্দেশ অনুযায়ী নতুন আরেকটি আইডিয়া নিয়ে পোস্ট ড্রাফট করছি... ⏳', fromId);
+              await sendTelegramMessage('🔄 ঠিক আছে বোরহান ভাই, পূর্ববর্তী টপিক বাদ দিয়ে একদম ভিন্ন ও আনকোরা আইডিয়া নিয়ে ফ্রেশ পোস্ট ড্রাফট করছি... ⏳', fromId);
               if (typeof onAction === 'function') {
-                await onAction('generate_tier', 2, fromId);
+                const latest = getLatestDraft();
+                await onAction('rotate_topic', { tier: latest?.tierLevel || 2 }, fromId);
               }
+              continue;
+            }
+
+            // একই বিষয়ের পুনরাবৃত্তি নিয়ে বোরহান ভাইয়ের অভিযোগ হ্যান্ডেল করা
+            const repetitionComplaintKeywords = [
+              'একই ধরনের পোস্ট', 'একই পোস্ট', 'একই বিষয়', 'একই টপিক', 'বারবার একই',
+              'বক্কর চক্কর', 'সবসময় একই', 'ঘুরে ফিরে একই', 'একই জিনিস'
+            ];
+            if (repetitionComplaintKeywords.some(k => text.includes(k))) {
+              await sendTelegramMessage(
+                `🌸 *বোরহান ভাই, আপনার কথা একদম ঠিক!* ❤️\n\n` +
+                `আগে পুরো দিন জুড়ে একক বিষয়ের কারণে বারবার একই নো-কোড ওয়েবসাইট নিয়ে পোস্ট তৈরি হচ্ছিল।\n` +
+                `এখন আমি অ্যান্টি-রিপিটিশন ফিল্টার ও প্রতিটি দিনের জন্য ৪টি স্বতন্ত্র সাব-থিম যুক্ত করেছি!\n\n` +
+                `🔄 আমি এখনই আপনার জন্য সম্পূর্ণ ভিন্ন একটি আকর্ষণীয় বিষয়ের ফ্রেশ ড্রাফট নিয়ে আসছি... ⏳`,
+                fromId
+              );
+              if (typeof onAction === 'function') {
+                await onAction('rotate_topic', { tier: 2 }, fromId);
+              }
+              continue;
+            }
+
+            // শিডিউল বা রুটিন দেখার কমান্ড
+            if (text === '/schedule' || text === '/শিডিউল' || text.includes('শিডিউল কি') || text.includes('সাপ্তাহিক শিডিউল') || text.includes('রুটিন কি') || text === 'schedule' || text === 'শিডিউল') {
+              const scheduleMsg = formatWeeklyScheduleMessage();
+              await sendTelegramMessage(scheduleMsg, fromId);
               continue;
             }
 
@@ -875,6 +903,7 @@ export function startApprovalListener(onAction) {
                 `• 🌇 *বিকাল ০৫:১৫ টা (আসরের পর):* *ডেইলি প্রম্পট ল্যাব* (Altiam Kabir স্টাইল কপি-পেস্ট প্রম্পট রেসিপি)\n` +
                 `• 🌙 *রাত ০৮:৩০ টা:* অ্যাডভান্সড পোস্ট (*Free vs Paid/Pro* বিস্তারিত বিশ্লেষণ)\n\n` +
                 `🎮 *কমান্ড শর্টকাট (পেজ ম্যানেজমেন্ট):*\n` +
+                `• /schedule - সাপ্তাহিক ৭ দিনের রুটিন ও আজকের উপ-বিষয় দেখতে\n` +
                 `• /card - এখনই দুপুরের পোস্ট কার্ড বানাও\n` +
                 `• /prompt - এখনই আসরের প্রম্পট রেসিপি পোস্ট বানাও\n` +
                 `• /morning - সকালের বিগিনার পোস্ট বানাও\n` +
@@ -1065,15 +1094,15 @@ export function startApprovalListener(onAction) {
                 await sendTelegramMessage('⚠️ কোনো ড্রাফট পাওয়া যায়নি! নতুন পোস্ট বানাতে /card বা /prompt লিখুন।', fromId);
               }
             } else if (action === 'regen_draft') {
-              await sendTelegramMessage('🔄 ঠিক আছে বোরহান ভাই, আপনার নির্দেশ অনুযায়ী নতুন আরেকটি আইডিয়া নিয়ে পোস্ট ড্রাফট করছি... ⏳', fromId);
+              await sendTelegramMessage('🔄 ঠিক আছে বোরহান ভাই, আপনার নির্দেশ অনুযায়ী ভিন্ন একটি আকর্ষণীয় আইডিয়া নিয়ে নতুন পোস্ট ড্রাফট করছি... ⏳', fromId);
               if (typeof onAction === 'function') {
                 const latest = getLatestDraft();
                 if (latest && latest.tierName === 'ভাইরাল ওয়ার্কফ্লো ল্যাব') {
                   await onAction('craft_viral_post', { niche: 'restaurant' }, fromId);
                 } else if (latest && latest.tierLevel) {
-                  await onAction('generate_tier', latest.tierLevel, fromId);
+                  await onAction('rotate_topic', { tier: latest.tierLevel }, fromId);
                 } else {
-                  await onAction('generate_tier', 2, fromId);
+                  await onAction('rotate_topic', { tier: 2 }, fromId);
                 }
               }
             }

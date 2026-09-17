@@ -12,13 +12,13 @@ import { startWhatsAppClient } from './services/whatsappService.js';
 console.log('🚀 Ai Revolution - ৪-স্তরের লাইভ এআই অটোমেশন ও অ্যাসিস্ট্যান্ট বট চালু হচ্ছে...');
 validateConfig();
 
-export async function runScavengedCycle(tierLevel = 1, targetChatId = config.telegramChatId) {
+export async function runScavengedCycle(tierLevel = 1, targetChatId = config.telegramChatId, forceRotate = false) {
   try {
     const todayIndex = new Date().getDay();
     const dayPlan = WEEKLY_SCHEDULE[todayIndex] || WEEKLY_SCHEDULE[3];
 
-    console.log(`🔍 [${dayPlan.dayName} - ${dayPlan.pillar}] তাজা টপিক কুড়ানো হচ্ছে (স্তর ${tierLevel})...`);
-    const liveTopic = await fetchDailyTrendingAITopic(dayPlan.pillar, todayIndex);
+    console.log(`🔍 [${dayPlan.dayName} - ${dayPlan.pillar}] তাজা টপিক কুড়ানো হচ্ছে (স্তর ${tierLevel}, রোটেট: ${forceRotate})...`);
+    const liveTopic = await fetchDailyTrendingAITopic(dayPlan.pillar, todayIndex, tierLevel, forceRotate);
 
     console.log(`✍️ এআই দিয়ে পোস্ট ড্রাফট তৈরি হচ্ছে: ${liveTopic.title}`);
     const postData = await generateTieredPost(tierLevel, liveTopic, todayIndex);
@@ -130,7 +130,12 @@ export async function runViralWorkflowCycle(niche = 'restaurant', targetChatId =
 // টেলিগ্রাম ইন্টারঅ্যাক্টিভ লিসেনার চালু করা
 startApprovalListener(async (action, payload, chatId) => {
   if (action === 'generate_tier') {
-    await runScavengedCycle(payload, chatId);
+    const tier = typeof payload === 'object' ? payload.tier : payload;
+    const forceRotate = typeof payload === 'object' ? !!payload.forceRotate : false;
+    await runScavengedCycle(tier || 2, chatId, forceRotate);
+  } else if (action === 'rotate_topic') {
+    const tier = typeof payload === 'object' ? payload.tier : payload;
+    await runScavengedCycle(tier || 2, chatId, true);
   } else if (action === 'craft_custom_post') {
     await runCustomCraftCycle(payload.topic, payload.tier || 4, chatId);
   } else if (action === 'craft_viral_post') {
