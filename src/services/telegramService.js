@@ -364,7 +364,7 @@ JSON ফরম্যাটে আউটপুট দাও:
 
   // ১. Gemini Vision দিয়ে ইমেজ বিশ্লেষণ
   if (config.geminiApiKey) {
-    const visionModels = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+    const visionModels = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
     for (const modelName of visionModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.geminiApiKey}`;
@@ -402,7 +402,7 @@ JSON ফরম্যাটে আউটপুট দাও:
     }
 
     // ২. ফলব্যাক: Gemini Text-Only
-    const textModels = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+    const textModels = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
     for (const modelName of textModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.geminiApiKey}`;
@@ -545,7 +545,7 @@ JSON ফরম্যাটে উত্তর দাও:
 
     let parsedSuccessfully = false;
     if (config.geminiApiKey) {
-      const models = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+      const models = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
       for (const model of models) {
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.geminiApiKey}`, {

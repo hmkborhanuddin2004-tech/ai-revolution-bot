@@ -9,10 +9,10 @@ const personalFacts = new Map();
 // ——— Gemini multi-model fallback ———
 async function geminiChat(prompt, maxTokens = 1500) {
   const models = [
-    'gemini-3.6-flash',
     'gemini-3.1-flash-lite',
-    'gemini-3.5-flash',
-    'gemini-3.1-flash-lite-preview'
+    'gemini-3.1-flash-lite-preview',
+    'gemini-3.6-flash',
+    'gemini-3.5-flash'
   ];
   for (const modelName of models) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.geminiApiKey}`;
@@ -39,7 +39,7 @@ async function geminiChat(prompt, maxTokens = 1500) {
 
 // ——— Vision model for image and document analysis ———
 async function geminiVision(prompt, base64Data, mimeType) {
-  const models = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+  const models = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
   for (const modelName of models) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.geminiApiKey}`;
     try {

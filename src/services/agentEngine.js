@@ -11,7 +11,7 @@ import { BORHAN_FB_PROFILE } from '../config.js';
 
 export class AgentEngine {
   constructor() {
-    this.models = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.8-flash', 'gemini-3.7-flash'];
+    this.models = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
     this.tools = [{ functionDeclarations: AGENT_TOOL_DECLARATIONS }];
   }
 

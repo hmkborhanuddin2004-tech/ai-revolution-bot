@@ -1,11 +1,12 @@
-﻿/**
+/**
  * WhatsApp QR Code Authenticator
  * একবার চালালেই QR কোড দেখাবে — স্ক্যান করলেই শেষ!
  * পরে আর চালাতে হবে না, session স্বয়ংক্রিয় সেভ থাকে।
  */
 
 import pkg from 'whatsapp-web.js';
-const { Client, LocalAuth } = pkg;
+const actual = pkg.default || pkg;
+const { Client, LocalAuth } = actual;
 import qrcode from 'qrcode-terminal';
 
 console.log('==============================================');
@@ -34,7 +35,7 @@ const client = new Client({
   }
 });
 
-client.on('qr', (qr) => {
+client.on('qr', async (qr) => {
   console.log('');
   console.log('✅ QR কোড প্রস্তুত! এখন স্ক্যান করুন:');
   console.log('');
@@ -42,6 +43,18 @@ client.on('qr', (qr) => {
   console.log('');
   qrcode.generate(qr, { small: true });
   console.log('');
+
+  try {
+    const QRCodeImg = await import('qrcode');
+    const qrSaver = QRCodeImg.default || QRCodeImg;
+    const brainQrPath = 'C:/Users/assdi/.gemini/antigravity/brain/b42529dc-7d3f-4527-9fb7-7db67a924824/whatsapp_qr.png';
+    await qrSaver.toFile(brainQrPath, qr, { width: 450, margin: 2 });
+    await qrSaver.toFile('D:/ai-insight-bot/whatsapp_qr.png', qr, { width: 450, margin: 2 });
+    console.log('📸 QR কোডের ছবি সেভ হয়েছে: whatsapp_qr.png');
+  } catch (imgErr) {
+    // Ignore image save error
+  }
+
   console.log('⏳ স্ক্যানের জন্য অপেক্ষা করছি...');
 });
 

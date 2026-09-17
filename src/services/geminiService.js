@@ -275,7 +275,7 @@ ${tierPlan.formatInstruction}
 }
 `;
 
-  const modelsToTry = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+  const modelsToTry = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
 
   let lastError = null;
   for (const modelName of modelsToTry) {
@@ -376,7 +376,7 @@ ${TIERS[5].formatInstruction}
 }
 `;
 
-  const modelsToTry = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+  const modelsToTry = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
 
   let lastError = null;
   for (const modelName of modelsToTry) {
@@ -460,7 +460,7 @@ export async function modifyDraftContent(draft, instruction) {
 }
 `;
 
-  const modelsToTry = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+  const modelsToTry = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
 
   let lastError = null;
   for (const modelName of modelsToTry) {
@@ -535,7 +535,7 @@ export async function chatWithGemini(userMessage) {
 ৫. উত্তর ২-৩ প্যারার মধ্যে সংক্ষিপ্ত, আকর্ষণীয় ও প্রাণবন্ত রাখবে।
 `;
 
-  const modelsToTry = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+  const modelsToTry = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
 
   for (const modelName of modelsToTry) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.geminiApiKey}`;
@@ -668,7 +668,7 @@ ${visitorLine}ভিজিটরের বক্তব্য: "${cleanText}"
 ৯. দৈর্ঘ্য: ১ থেকে ২ বাক্যের মধ্যে সংক্ষিপ্ত, স্পষ্ট ও পরিশীলিত রাখবে।
 `;
 
-  const modelsToTry = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite-preview'];
+  const modelsToTry = ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.6-flash', 'gemini-3.5-flash'];
 
   for (const modelName of modelsToTry) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.geminiApiKey}`;
