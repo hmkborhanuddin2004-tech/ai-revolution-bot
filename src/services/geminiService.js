@@ -260,9 +260,10 @@ ${tierPlan.formatInstruction}
 ৪. মূল কপি-পেস্ট এআই প্রম্পট পোস্টের বডিতে ব্লু পয়েন্টের ভেতরেই সরাসরি দেবে যাতে পাঠক সাথে সাথে সমাধান পায়।
 ৫. ক্যাপশনে কোনো এক্সটার্নাল লিঙ্ক (URL) বা "তথ্যসূত্র:" লিখবে না (ফেসবুকে লিংকের কারণে রিচ কমে যায়)।
 ৬. কোনো সিস্টেম মেসেজ বা 'বোরহান ভাই অনুমতি দিলে...' এমন কথা ক্যাপশনে কখনোই থাকবে না।
-৭. ছবির ইংরেজি প্রম্পট (image_prompt) হবে অত্যন্ত ভিজ্যুয়াল, সিনেমাটিক ও হাই-কনসেপ্ট:
-   - এটি কোনো জেনেরিক ছবি নয়, বরং আজকের বিষয়ের সাথে সম্পর্কিত একটি সিনেমাটিক ৩ডি সিন ডেসক্রিপশন।
-   - স্পেসিফিক সিনেমাটিক এলিমেন্টস উল্লেখ করবে: (যেমন: glowing holographic interface, futuristic cybernetic developer desk, neon cyan & warm amber volumetric lighting, octane render, 8k, photorealistic texture, shallow depth of field, no text, no watermark)।
+৭. ছবির ইংরেজি প্রম্পট (image_prompt) হবে স্পষ্ট ফোকাস, বাস্তবসম্মত সাবজেক্ট ও উজ্জ্বল আলো সহ দৃষ্টিনন্দন দৃশ্য:
+   - কোনো অন্ধকার, নীল বা ধোঁয়াটে রুম ভুলেও দেবে না। সবসময় উজ্জ্বল দিনের আলো (natural daylight) বা প্রফেশনাল স্টুডিও লাইটিং রাখবে।
+   - বাস্তবসম্মত আকর্ষণীয় সাবজেক্ট: আধুনিক কাঁচের দেয়ালঘেরা সানলিট অফিস, ক্রিয়েটিভ তরুণ ইঞ্জিনিয়ার ল্যাপটপে কাজ করছেন, অথবা ঝকঝকে স্মার্টফোনে চোখধাঁধানো রঙিন ৩ডি মোবাইল অ্যাপ ইউআই ডিসপ্লে।
+   - স্পেসিফিক এলিমেন্টস: (Bright natural studio lighting, modern clean aesthetic, ultra-sharp focus, crisp 8k details, vivid rich colors, high dynamic range, Sony A7 IV commercial photography style or polished 3D Octane Render, no text, no watermark, no blur, no dark moody fog)।
    - ২০ থেকে ৩০ শব্দের আকর্ষণীয় ইংরেজি ডেসক্রিপশন দেবে।
 ৮. প্রথম কমেন্ট পলিসি: ১টির বেশি অতিরিক্ত প্রম্পট থাকলে তবেই তা "firstComment" ফিল্ডে দেবে। ১টি প্রম্পট হলে তা সরাসরি পোস্টেই থাকবে এবং firstComment খালি থাকবে।
 
@@ -271,7 +272,7 @@ ${tierPlan.formatInstruction}
   "title": "পোস্টের মূল বাংলা শিরোনাম",
   "content": "সম্পূর্ণ ফেসবুক ক্যাপশন টেক্সট (১-লাইন হুক দিয়ে শুরু, তথ্যবহুল, ব্লু পয়েন্ট 🔹 দিয়ে গোছানো গাইড ও হ্যাশট্যাগ সহ - কোনো [ফেসবুক পোস্ট ক্যাপশন] বা ডিভাইডার দাগ ছাড়া)",
   "firstComment": "📌 অতিরিক্ত প্রম্পট বা বোনাস টিপস (যদি ১টির বেশি প্রম্পট থাকে)...",
-  "image_prompt": "Cinematic 8k photograph of a futuristic AI holographic interface, glowing neural networks, volumetric lighting, Octane render, ultra-realistic, photorealistic textures, no text, no watermark"
+  "image_prompt": "A modern bright sunlit tech workspace, young energetic professional creating innovative digital tools, glowing vibrant UI screens, sharp 8k focus, vivid colors, crisp commercial photography, no text, no watermark, no dark fog"
 }
 `;
 

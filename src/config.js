@@ -16,6 +16,8 @@ export const config = {
   fbPageAccessToken: process.env.FB_PAGE_ACCESS_TOKEN || '',
   postingHour: parseInt(process.env.POSTING_HOUR || '19', 10),
   postingMinute: parseInt(process.env.POSTING_MINUTE || '30', 10),
+  pollinationsApiKey: process.env.POLLINATIONS_API_KEY || '',
+  hfToken: process.env.HF_TOKEN || '',
   port: process.env.PORT || 3001
 };
 

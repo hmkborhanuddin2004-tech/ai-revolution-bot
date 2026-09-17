@@ -76,18 +76,19 @@ export function enhanceVisualPrompt(basePrompt, isPortrait = false) {
   }
 
   const techTokens = [
-    'breathtaking 3D Octane Render 8K',
-    'cinematic 3D render for tech and futuristic office',
-    'volumetric ray-traced lighting',
-    'glowing cyan and amber illumination',
+    'bright natural cinematic lighting',
+    'modern clean high-end aesthetic',
+    'ultra-sharp focus and crisp 8k details',
+    'vivid rich colors and high dynamic range',
+    'Sony A7 IV commercial photography style or polished 3D Octane Render',
     'photorealistic glass and metallic textures',
-    'clean elegant high-tech workspace aesthetics',
-    'viral Facebook visual hook',
-    'hyper-sharp focus',
-    'Unreal Engine 5 render',
+    'clear engaging composition with distinct subject',
+    'trending on Artstation',
     'masterpiece',
     'no text',
     'no watermark',
+    'no blur',
+    'no dark moody fog',
     'no distorted elements'
   ];
 
@@ -210,6 +211,47 @@ export async function generateImageUrl(imagePrompt, customOptions = {}) {
     const width = customOptions.width || 1080;
     const height = customOptions.height || 1080;
     const seed = customOptions.seed || Math.floor(Math.random() * 10000000);
+
+    // ০. Authenticated Pollinations Engine (FLUX.1 Schnell & Leonardo Phoenix with ZERO watermark)
+    if (config.pollinationsApiKey) {
+      const authModels = isPortrait
+        ? ['community/MarcosFRG/phoenix-1.0', 'black-forest-labs/flux.1-schnell', 'black-forest-labs/flux.2-klein-4b']
+        : ['black-forest-labs/flux.1-schnell', 'community/MarcosFRG/phoenix-1.0', 'community/CloudCompile/flux-2-klein-4b', 'community/CloudCompile/sdxl-lightning'];
+
+      for (const authModel of authModels) {
+        try {
+          const genUrl = `https://gen.pollinations.ai/image/${encoded}?model=${encodeURIComponent(authModel)}&width=${width}&height=${height}&seed=${seed}`;
+          console.log(`💎 [imageService] Authenticated Pollinations (${authModel}) দিয়ে ওয়াটারমার্ক-হীন 8K ছবি প্রস্তুত করা হচ্ছে...`);
+          const res = await fetch(genUrl, {
+            headers: { 'Authorization': `Bearer ${config.pollinationsApiKey}` },
+            signal: AbortSignal.timeout(40000)
+          });
+
+          if (res.ok) {
+            const arrayBuf = await res.arrayBuffer();
+            const buffer = Buffer.from(arrayBuf);
+            const imgDir = path.resolve('D:/ai-insight-bot/data/generated_images');
+            if (!fs.existsSync(imgDir)) {
+              fs.mkdirSync(imgDir, { recursive: true });
+            }
+            const cleanModelName = authModel.split('/').pop().replace(/[^a-zA-Z0-9_-]/g, '_');
+            const localFilePath = path.join(imgDir, `pollinations_auth_${cleanModelName}_${Date.now()}_${seed}.jpg`);
+            fs.writeFileSync(localFilePath, buffer);
+            console.log(`✨ [imageService] ওয়াটারমার্ক-মুক্ত আল্ট্রা-এইচডি ছবি প্রস্তুত ও সেভ হয়েছে: ${localFilePath}`);
+
+            urlToLocalPathCache.set(genUrl, localFilePath);
+            if (customOptions.returnLocalPath) {
+              return localFilePath;
+            }
+            return genUrl;
+          } else {
+            console.warn(`[imageService] Auth Model ${authModel} HTTP ${res.status}: ${await res.text().catch(() => '')}`);
+          }
+        } catch (authErr) {
+          console.warn(`[imageService] Auth Model ${authModel} error:`, authErr.message);
+        }
+      }
+    }
 
     // ১. Primary Free Engine: Pollinations Flux Multi-Model ('flux', 'turbo', 'flux-realism', 'sana')
     // 'flux' is highest quality; 'turbo' is fast & resilient; 'flux-realism' for portraits; 'sana' as upstream fallback
