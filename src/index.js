@@ -181,7 +181,7 @@ startWebhookServer(serverPort);
 
 // ৩. 📱 WhatsApp পার্সোনাল অ্যাসিস্ট্যান্ট চালু করা (লোকাল মেশিনের জন্য)
 // 🔴 কঠোর নিয়ম: গ্রুপে কোনো রিপ্লাই দেবে না — কোডে লক করা
-if (!process.env.RENDER) {
+if (!process.env.RENDER && process.env.ENABLE_LOCAL_WHATSAPP === 'true') {
   startWhatsAppClient().then((client) => {
     if (client) {
       console.log('📱 WhatsApp অ্যাসিস্ট্যান্ট চালু হয়েছে (গ্রুপে রিপ্লাই নিষিদ্ধ)।');
