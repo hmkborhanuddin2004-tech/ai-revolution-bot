@@ -255,3 +255,71 @@ export async function getRecentConversations(limit = 5) {
     return [];
   }
 }
+
+/**
+ * Uploads a Reel to the Facebook Page using the 3-step Reels API.
+ * @param {string} videoPath - Local path to the .mp4 file
+ * @param {string} description - Caption for the reel
+ */
+export async function uploadReelToFacebook(videoPath, description) {
+  if (!config.fbPageAccessToken || config.fbPageAccessToken === 'YOUR_PAGE_ACCESS_TOKEN_HERE') {
+    return { success: false, reason: 'TOKEN_NOT_CONFIGURED', error: 'No FB token.' };
+  }
+
+  try {
+    const fileStat = fs.statSync(videoPath);
+    const fileSize = fileStat.size;
+
+    // 1. Start Phase
+    const startRes = await fetch(`https://graph.facebook.com/v21.0/${config.fbPageId}/video_reels`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upload_phase: 'start',
+        access_token: config.fbPageAccessToken
+      })
+    });
+    const startData = await startRes.json();
+    if (startData.error) throw new Error(startData.error.message);
+    const { video_id, upload_url } = startData;
+
+    // 2. Upload Phase
+    const fileBuffer = fs.readFileSync(videoPath);
+    const uploadRes = await fetch(upload_url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `OAuth ${config.fbPageAccessToken}`,
+        'offset': '0',
+        'file_size': fileSize.toString()
+      },
+      body: fileBuffer
+    });
+    const uploadData = await uploadRes.json();
+    if (uploadData.error) throw new Error(uploadData.error.message);
+
+    // 3. Finish Phase
+    const finishRes = await fetch(`https://graph.facebook.com/v21.0/${config.fbPageId}/video_reels`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upload_phase: 'finish',
+        video_id: video_id,
+        video_state: 'PUBLISHED',
+        description: description,
+        access_token: config.fbPageAccessToken
+      })
+    });
+    const finishData = await finishRes.json();
+    if (finishData.error) throw new Error(finishData.error.message);
+
+    return {
+      success: true,
+      videoId: video_id,
+      postUrl: `https://facebook.com/reel/${video_id}`
+    };
+  } catch (err) {
+    console.error('Reel upload error:', err);
+    return { success: false, error: err.message };
+  }
+}
+

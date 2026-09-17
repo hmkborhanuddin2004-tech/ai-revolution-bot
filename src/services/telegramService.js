@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { config } from '../config.js';
-import { publishToFacebook, replyToComment } from './facebookService.js';
+import { publishToFacebook, replyToComment, uploadReelToFacebook } from './facebookService.js';
 import { chatWithGemini, WEEKLY_SCHEDULE, sanitizePostContent, formatWeeklyScheduleMessage } from './geminiService.js';
 import { processAssistantMessage, processFile, processPhoto } from './personalAssistantService.js';
 import { getLocalCachedImagePath, generateImageUrl } from './imageService.js';
+import { createAiReel } from './reelsService.js';
 
 const DRAFT_FILE = path.resolve('D:/ai-insight-bot/data/latestDraft.json');
 
@@ -768,6 +769,51 @@ export function startApprovalListener(onAction) {
               continue;
             }
 
+            // /reel command handling for automated video generation
+            if (text.startsWith('/reel')) {
+              const topic = msg.text.replace('/reel', '').trim() || 'AI Tools and Productivity';
+              await sendTelegramMessage(`🎬 *আপনার নির্দেশ অনুযায়ী Reel তৈরি করা হচ্ছে বোরহান ভাই!* ⏳\n\nবিষয়: ${topic}\n\n_AI স্ক্রিপ্ট, Edge-TTS ভয়েসওভার এবং ৩ডি ভিজ্যুয়াল তৈরি হচ্ছে। সময় লাগতে পারে ৩০-৬০ সেকেন্ড।_`, fromId);
+              
+              try {
+                const { videoPath, script } = await createAiReel(topic);
+                
+                const completeDraft = {
+                  isReel: true,
+                  videoPath: videoPath,
+                  content: script,
+                  title: topic,
+                  tierName: 'Reel AI Automation'
+                };
+                saveLatestDraft(completeDraft);
+                
+                const formData = new FormData();
+                formData.append('chat_id', fromId);
+                const fileBuffer = fs.readFileSync(videoPath);
+                formData.append('video', new Blob([fileBuffer], { type: 'video/mp4' }), 'reel.mp4');
+                formData.append('caption', `🎬 *আপনার ভিডিও প্রস্তুত!* 🥳\n\n📜 *স্ক্রিপ্ট:*\n${script}\n\n_আপনি কি এটি পেজে প্রকাশ করতে চান?_`);
+                formData.append('parse_mode', 'Markdown');
+                formData.append('reply_markup', JSON.stringify({
+                  inline_keyboard: [
+                    [
+                      { text: '🚀 Approve & Post to FB', callback_data: 'publish_reel' }
+                    ],
+                    [
+                      { text: '❌ Reject', callback_data: 'reject_reel' }
+                    ]
+                  ]
+                }));
+                
+                await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendVideo`, {
+                  method: 'POST',
+                  body: formData
+                });
+              } catch (reelErr) {
+                console.error('Reel generation error in telegram:', reelErr);
+                await sendTelegramMessage(`⚠️ দুঃখিত বোরহান ভাই, রিলসটি তৈরি করতে সমস্যা হয়েছে: ${reelErr.message}`, fromId);
+              }
+              continue;
+            }
+
             // সরাসরি ছবি বানানোর নির্দেশ
             if ((text.includes('chobi banao') || text.includes('ছবি বানাও') || text.includes('chobi dao') || text.includes('chobi banaw')) && !text.includes('/image') && !text.includes('/ছবি')) {
               const latest = getLatestDraft();
@@ -1105,6 +1151,23 @@ export function startApprovalListener(onAction) {
                   await onAction('rotate_topic', { tier: 2 }, fromId);
                 }
               }
+            } else if (action === 'publish_reel') {
+              const latest = getLatestDraft();
+              if (latest && latest.isReel) {
+                await sendTelegramMessage('⏳ *আপনার অনুমতি গ্রহণ করা হয়েছে বোরহান ভাই!* ফেসবুকে Reel আপলোড করা হচ্ছে...', fromId);
+                const fbResult = await uploadReelToFacebook(latest.videoPath, latest.content);
+                if (fbResult.success) {
+                  await sendTelegramMessage(`✅ *আলহামদুলিল্লাহ বোরহান ভাই! আপনার অনুমোদনে Reel টি পেজে সফলভাবে পাবলিশ হয়েছে!* 🥳🎉\n🔗 *Reel লিঙ্ক:* ${fbResult.postUrl}`, fromId);
+                } else if (fbResult.reason === 'TOKEN_NOT_CONFIGURED') {
+                  await sendTelegramMessage(`⚠️ *ফেসবুক এক্সেস টোকেন বাকি আছে*`, fromId);
+                } else {
+                  await sendTelegramMessage(`❌ ফেসবুক এরর: ${fbResult.error}`, fromId);
+                }
+              } else {
+                await sendTelegramMessage('⚠️ কোনো Reel ড্রাফট পাওয়া যায়নি!', fromId);
+              }
+            } else if (action === 'reject_reel') {
+              await sendTelegramMessage('❌ ঠিক আছে বোরহান ভাই, এই Reel টি বাতিল করা হলো। আপনি চাইলে নতুন করে /reel <টপিক> লিখে কমান্ড দিতে পারেন।', fromId);
             }
           }
         } catch (uErr) {
