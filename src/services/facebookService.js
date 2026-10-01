@@ -210,7 +210,7 @@ export async function getRecentPostsWithComments(limit = 5) {
     return [];
   }
 
-  const endpoint = `https://graph.facebook.com/v21.0/${config.fbPageId}/feed?fields=id,message,created_time,comments{id,message,attachment,from,created_time}&limit=${limit}&access_token=${encodeURIComponent(config.fbPageAccessToken)}`;
+  const endpoint = `https://graph.facebook.com/v21.0/${config.fbPageId}/feed?fields=id,message,created_time,comments{id,message,attachment,from,created_time,comments{id,message,from}}&limit=${limit}&access_token=${encodeURIComponent(config.fbPageAccessToken)}`;
   try {
     const res = await fetch(endpoint);
     const data = await res.json();

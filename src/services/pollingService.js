@@ -71,16 +71,31 @@ export class PollingService {
       for (const comment of comments) {
         comment.postId = post.id;
 
+        // ১. লোকাল মেমোরি ট্র্যাকার চেক: এই সেশনে অলরেডি উত্তর দেওয়া হয়ে থাকলে স্কিপ
         if (duplicateTracker.has(comment.id)) {
           continue;
         }
 
-        // ২৪ ঘণ্টার বেশি পুরনো কমেন্ট হলে সিন মার্ক করে স্কিপ
+        // ২. ফেসবুক ক্লাউড স্টেট লক: কমেন্টটির নিচে কি পেজ অলরেডি উত্তর দিয়ে রেখেছে?
+        const nestedReplies = comment.comments?.data || [];
+        const alreadyAnsweredByPage = nestedReplies.some(
+          r => r.from?.id === String(config.fbPageId)
+        );
+
+        if (alreadyAnsweredByPage) {
+          duplicateTracker.add(comment.id);
+          continue;
+        }
+
+        // ৩. ২৪ ঘণ্টার বেশি পুরনো কমেন্ট হলে সিন মার্ক করে স্কিপ
         const commentTime = comment.created_time ? new Date(comment.created_time).getTime() : 0;
         if (commentTime && (Date.now() - commentTime) > 24 * 3600 * 1000) {
           duplicateTracker.add(comment.id);
           continue;
         }
+
+        // ৪. রেস-কন্ডিশন ঠেকাতে সাথে সাথে ট্র্যাকার যোগ করা
+        duplicateTracker.add(comment.id);
 
         await commentHandler.handleComment(comment);
       }
