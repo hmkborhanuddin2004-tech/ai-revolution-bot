@@ -8,6 +8,7 @@ import { pollingService } from './services/pollingService.js';
 import { startWebhookServer } from './services/webhookServer.js';
 import { sendDailyExecutiveReport } from './services/reportService.js';
 import { startWhatsAppClient } from './services/whatsappService.js';
+import { keepAliveService } from './services/keepAliveService.js';
 
 console.log('🚀 Ai Revolution - ৪-স্তরের লাইভ এআই অটোমেশন ও অ্যাসিস্ট্যান্ট বট চালু হচ্ছে...');
 validateConfig();
@@ -183,6 +184,9 @@ pollingService.start();
 // ২. রিয়েল-টাইম ওয়েবহুক রিসিভার (লোকালে ৩০০১, রেন্ডারে process.env.PORT)
 const serverPort = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 startWebhookServer(serverPort);
+
+// ৩. ২৪/৭ ক্লাউড কিপ-অ্যালাইভ সেলফ-পিং সার্ভিস চালু করা (রেন্ডার স্লিপ প্রতিরোধ)
+keepAliveService.start();
 
 // ৩. 📱 WhatsApp পার্সোনাল অ্যাসিস্ট্যান্ট চালু করা (লোকাল মেশিনের জন্য)
 // 🔴 কঠোর নিয়ম: গ্রুপে কোনো রিপ্লাই দেবে না — কোডে লক করা
