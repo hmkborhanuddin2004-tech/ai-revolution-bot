@@ -1,45 +1,64 @@
-# 🤖 AI Revolution Bot — Autonomous Social Media & Meta Business Growth Agent
+# AI Revolution Bot - Social Media Automation Service
 
-An enterprise-grade autonomous social media growth and marketing agent powered by **Google Gemini**, **FLUX AI image generation**, and the **Meta Graph API (Facebook & Instagram)**. Designed for 24/7 continuous operation to curate trending AI news, generate contextual copy, synthesize visual creatives, and automatically publish and engage with audiences.
-
----
-
-## 🌟 Key Features
-
-- 🔍 **Autonomous News Discovery (Scavenger Agent):** Real-time web scraping and RSS analysis discovering trending breakthrough AI stories.
-- ✍️ **Intelligent Copywriting with Gemini:** Multi-tier prompt architecture generating engaging, high-conversion post captions and hashtags tailored for Meta platforms.
-- 🎨 **Automated Image Synthesis:** Generates high-resolution 1080×1080 promotional artwork via FLUX / AI visual models.
-- 📱 **Meta Graph API Publishing:** Direct automated publishing to Facebook Pages, Messenger automation, and comment sentiment monitoring.
-- 💬 **Interactive Engagement Engine:** Handles incoming Facebook comments, Messenger inquiries, and auto-dispatches alerts to Telegram.
-- ☁️ **Resilient 24/7 Deployment:** Engineered with keep-alive pingers, memory persistence, duplicate trackers, and multi-model failover.
+An autonomous social media publishing and growth service powered by the Meta Graph API (Facebook & Instagram) and Google Gemini. Designed for scheduled operation to curate technological news, generate contextual summaries, format visual assets, and publish updates with automated interaction handling.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## System Features
 
-- **Core Runtime:** Node.js (ES Modules) & Python
-- **AI Models:** Google Gemini API & FLUX AI
-- **APIs & Integrations:** Meta Graph API (Facebook Pages & Messenger), Telegram Bot API, WhatsApp Webhooks
-- **Scraping & Ingestion:** Cheerio, Axios, RSS Feed Parsers
-- **Resilience:** Keep-alive pingers, automated token refreshers, and JSON state persistence
+- **Automated News Ingestion:** Scheduled web scraping and RSS analysis compiling trending technological updates.
+- **Contextual Copywriting:** Multi-tier prompt processing generating structured post captions and topical hashtags.
+- **Meta Graph API Publishing:** Direct automated publishing to Facebook Pages with rate-limiting compliance.
+- **Interactive Engagement Engine:** Webhook-based handling of incoming comments and messaging notifications with automated Telegram alerts.
+- **Service Resilience:** Integrated keep-alive pingers, memory persistence, duplicate trackers, and automated retry policies.
 
 ---
 
-## 🚀 Getting Started
+## Architecture & Technical Stack
+
+- **Runtime:** Node.js (ES Modules) & Python
+- **APIs & Protocols:** Meta Graph API, Telegram Bot API, WhatsApp Webhooks
+- **Content Generation:** Google Gemini API
+- **Scraping & Ingestion:** Cheerio, Axios, RSS XML Parsers
+- **Resilience:** JSON state persistence and health monitoring daemons
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/hmkborhanuddin2004-tech/ai-revolution-bot.git
 cd ai-revolution-bot
+```
+
+### 2. Install dependencies
+
+```bash
 npm install
-cp .env.example .env
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the root directory:
+
+```env
+FB_PAGE_ID=your_facebook_page_id
+FB_PAGE_ACCESS_TOKEN=your_permanent_access_token
+GEMINI_API_KEY=your_gemini_api_key
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+PORT=3000
+```
+
+### 4. Start the service
+
+```bash
 npm start
 ```
 
 ---
 
-## 👨‍💻 Author
+## License
 
-**HMk Borhan Uddin**  
-Full-Stack Developer · AI Automation & Meta Business Growth Specialist  
-- GitHub: [@hmkborhanuddin2004-tech](https://github.com/hmkborhanuddin2004-tech)
-- Portfolio: [hmkborhanuddin2004-tech.github.io](https://hmkborhanuddin2004-tech.github.io)
+This project is licensed under the MIT License.
